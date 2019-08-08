@@ -1,0 +1,154 @@
+<!doctype html>
+{% load staticfiles %}
+
+<html>
+<head>
+    <title>MapApp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+</head>
+<body class='tit'>
+	<h1>Welcome to MyMapApp!</h1>
+
+</body>
+<div id="mynetwork"></div>
+
+<body>
+	
+    <input type="text" id="userInput"=>What's the first thing that comes to mind when you think of:</input>
+    <h1 class="word" id="lastword">Home</h1>
+    <br></br>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <button class="btn" onclick="test()">Submit</button>
+    <button class="btn" onclick="back()">Back</button>
+    <button class="btn" onclick="backhome()">Back Home</button>
+    <button class="btn" onclick="jsonify(arr,num)">ZIP!</button>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script>
+    	let arr=[];
+    	let i=arr.length;
+    	let num=[];
+        function test() {
+            var userInput = document.getElementById("userInput").value;
+            i=i+1;
+            arr.push(userInput);
+            num.push(i);
+            document.getElementById("userInput").value="";
+            lastword=document.getElementById("lastword").value;
+            document.getElementById("lastword").innerHTML=arr[arr.length-1];
+            console.log(arr);
+            console.log(num);
+        }
+        function back() {
+        	document.getElementById("lastword").innerHTML=arr[arr.length-2];
+        	num.splice(arr.length-1,2,i);
+        	i=i-1;
+        	console.log(arr);
+        	console.log(num);
+
+        }
+
+        function backhome() {
+        	document.getElementById("lastword").innerHTML=arr[0];
+        	i=1;
+        	num.push(i);
+        	console.log(arr);
+        	console.log(num);
+        }
+  
+		
+		var data={
+			nodes: { },
+			links: { }
+		};
+        console.log(arr);
+        function jsonify(a,b) {
+		  var added = [];
+		  var linkeroos=[]
+		  var h=linkeroos.length;
+		  for (var key in b ) {
+		  	added.push([a[key], b[key]]);
+		  	linkeroos.push(b[h],b[h+1]);
+		  } 
+  		  console.log(added);
+  		  console.log(linkeroos);
+  		  data.nodes=JSON.stringify(Object.assign(data.nodes,added));
+  		  data.links=JSON.stringify(Object.assign(data.links,linkeroos));
+  		  console.log(data.nodes);
+  		  console.log(data.links);
+  		  console.log(data);
+
+  		 
+				}
+
+	// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 40},
+  width = 400 - margin.left - margin.right,
+  height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#mynetwork")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+JSON.parse(data, function( data) {
+
+  // Initialize the links
+  var link = svg
+    .selectAll("line")
+    .data(data[links])
+    .enter()
+    .append("line")
+      .style("stroke", "#aaa")
+
+  // Initialize the nodes
+  var node = svg
+    .selectAll("circle")
+    .data(data.nodes)
+    .enter()
+    .append("circle")
+      .attr("r", 20)
+      .style("fill", "#69b3a2")
+
+  // Let's list the force we wanna apply on the network
+  var simulation = d3.forceSimulation(data.nodes)                 // Force algorithm is applied to data.nodes
+      .force("link", d3.forceLink()                               // This force provides links between nodes
+            .id(function(d) { return d.id; })                     // This provide  the id of a node
+            .links(data.links)                                    // and this the list of links
+      )
+      .force("charge", d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
+      .force("center", d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
+      .on("end", ticked);
+
+  // This function is run at each iteration of the force algorithm, updating the nodes position.
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+         .attr("cx", function (d) { return d.x+6; })
+         .attr("cy", function(d) { return d.y-6; });
+  }
+
+});
+	
+
+	
+
+</script>
+
+		
+    <script type="text/javascript" src="{% static 'script.js' %}">  </script>
+
+</body>
+</html>
+
+
+ 
+
